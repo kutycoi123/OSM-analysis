@@ -19,11 +19,7 @@ schema = types.StructType([
 	types.StructField('name', types.StringType(), nullable=True),
 	types.StructField('tags', types.MapType(types.StringType(), types.StringType()), nullable=False),
 ])
-RANDOM_SEED = 13579
-TRAINING_DATA_RATIO = 0.7
-RF_NUM_TREES = 3
-RF_MAX_DEPTH = 4
-RF_MAX_BINS = 32
+
 def main(inputs, output):
     # main logic starts here
 	data = spark.read.json(inputs, schema=schema)
