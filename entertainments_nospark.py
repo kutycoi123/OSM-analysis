@@ -10,7 +10,7 @@ def main(inputs, output):
 	df = df[df['amenity'].isin(entertainments)]
 	#print(df['amenity'])
 	df.to_json(output, orient='records', compression='gzip', lines=True)
-	pass
+
 
 if __name__ == '__main__':
 	inputs = sys.argv[1]
