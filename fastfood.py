@@ -1,13 +1,9 @@
 import sys
 import pandas as pd
 
-entertainments = ['arts_centre', 'bistro', 'nightclub', 'bbq', 'car_rental',
-                      'leisure', 'park', 'restaurant', 'bar', 'casino', 'gambling',
-                      'cafe', 'theatre', 'stripclub', 'pub']
-
 def main(inputs, output):
 	df = pd.read_json(inputs, lines=True)
-	df = df[df['amenity'].isin(entertainments)]
+	df = df[df['amenity'] == 'fast_food']
 	#print(df['amenity'])
 	df.to_json(output, orient='records', compression='gzip', lines=True)
 	print(df.head(50))
