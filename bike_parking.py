@@ -1,13 +1,9 @@
-# Limit OSM data to just greater Vancouver
-# Typical invocation:
-# spark-submit just-vancouver.py amenities amenities-vancouver
-# hdfs dfs -cat amenities-vancouver/* | gzip -d - | gzip -c > amenities-vancouver.json.gz
-
 import sys
 assert sys.version_info >= (3, 5) # make sure we have Python 3.5+
 
 from pyspark.sql import SparkSession, functions, types, Row
 import matplotlib.pyplot as plt
+import re
 from pyspark.ml.feature import VectorAssembler
 from pyspark.ml.classification import LinearSVC
 from pyspark.ml.clustering import KMeans, KMeansModel
@@ -16,7 +12,7 @@ from pyspark.ml.feature import MinMaxScaler
 from pyspark.ml.linalg import Vectors
 
 
-spark = SparkSession.builder.appName('commuter').getOrCreate()
+spark = SparkSession.builder.appName('bike_parking').getOrCreate()
 assert spark.version >= '2.4' # make sure we have Spark 2.4+
 spark.sparkContext.setLogLevel('WARN')
 #sc = spark.sparkContext
@@ -31,32 +27,38 @@ amenity_schema = types.StructType([
     types.StructField('tags', types.MapType(types.StringType(), types.StringType()), nullable=False),
 ])
 
+def year_month(s):
+	return re.search(r'(\d+\-\d+).*', s).group(1)
 
 def main(inputs, output):
     poi = spark.read.json(inputs, schema=amenity_schema)
     poi = poi.filter((poi['lon'] > -123.5) & (poi['lon'] < -122))
     poi = poi.filter((poi['lat'] > 49) & (poi['lat'] < 49.5))
     # poi.show(100)
-    # schools = poi.filter(poi['amenity'] == 'school')
-    # prediction_data = poi.filter((functions.size('tags') > 0) & (poi['name'] != 'null'))
+    poi = poi.filter(poi['amenity'] == 'bicycle_parking')
+    split_date = functions.split(poi['timestamp'], ' ')
+    poi = poi.withColumn('date', split_date.getItem(0))
 
-    # training, validation = schools.randomSplit([.7, .3])
+    remove_day = functions.udf(year_month, returnType=types.StringType())
 
-    stage1 = VectorAssembler(inputCols =['lon', 'lat'], outputCol='features')
-    stage2 = MinMaxScaler(inputCol="features", outputCol="scaledFeatures")
-    stage3 = KMeans().setK(6).setFeaturesCol("scaledFeatures").setPredictionCol('prediction')
-    pipeline = Pipeline(stages=[stage1, stage2, stage3])
-    model = pipeline.fit(poi)
-    predictions = model.transform(poi)
-    plt.scatter(predictions.select('lon').collect(),
-                predictions.select('lat').collect(),
-                c=predictions.select('prediction').collect(),
-                cmap='Set1', edgecolor='k', s=20)
-    plt.savefig('potential_bus_zone')
+    bike_parking = poi.select(
+    	poi['lon'],
+    	poi['lat'],
+    	remove_day(poi['date']).alias('date'),
+    	poi['amenity'],
+    	poi['name']
+    )
+    print(bike_parking.count())
+    grouped_month = bike_parking.groupby('date').agg(functions.count(bike_parking['amenity']).alias('count'))
+    grouped_month = grouped_month.filter(grouped_month['count'] > 10)
+    grouped_month = grouped_month.sort('date')
+    df = grouped_month.toPandas()
+    plt.figure(figsize=(10, 5))
+    plt.xticks(rotation=45)
+    plt.locator_params(axis='x', nbins=10)
+    plt.plot(df['date'], df['count'], 'b')
+    plt.savefig('bike_parking_by_month')
     # plt.show()
-
-    #poi = poi.coalesce(1) # ~1MB after the filtering 
-    # poi.write.json(output, mode='overwrite', compression='gzip')
 
 
 if __name__ == '__main__':
