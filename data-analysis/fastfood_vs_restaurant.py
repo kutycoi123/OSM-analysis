@@ -6,8 +6,8 @@ import sys
 
 
 def main():
-	entertainments = pd.read_json("entertainments-with-ratings.json.gzip", orient='records', compression='gzip', lines=True)
-	fastfoods = pd.read_json("fastfood-with-ratings.json.gzip", orient='records', compression='gzip', lines=True)
+	entertainments = pd.read_json("../entertainments-with-ratings.json.gzip", orient='records', compression='gzip', lines=True)
+	fastfoods = pd.read_json("../fastfood-with-ratings.json.gzip", orient='records', compression='gzip', lines=True)
 	restaurants = entertainments[entertainments['amenity'] == 'restaurant']
 	restaurants = restaurants[restaurants['rating'].notna()]
 	fastfoods = fastfoods[fastfoods['rating'].notna()]
@@ -23,7 +23,7 @@ def main():
 	plt.hist(x, histtype='bar', label=['Restaurant', 'Fastfood'])
 	plt.title("Restaurant and fastfood ratings")
 	plt.legend(['Independent-owned restaurant', 'Fast food restaurant'])
-	plt.savefig("fastfood_vs_restaurant_historgram.png")
+	plt.savefig("../images/astfood_vs_restaurant_historgram.png")
 
 if __name__ == '__main__':
 	main()

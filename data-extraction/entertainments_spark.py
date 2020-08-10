@@ -20,10 +20,10 @@ entertainments = ['arts_centre', 'bistro', 'nightclub', 'bbq', 'car_rental',
                       'cafe', 'theatre', 'stripclub', 'pub']
 def main():
     # main logic starts here
-	data = spark.read.json("amenities-vancouver.json.gzip", schema=schema)
+	data = spark.read.json("../amenities-vancouver.json.gzip", schema=schema)
 	entertainments_data = data.filter(data.amenity.isin(entertainments))
 	#entertainments_data.show()
-	entertainments_data.write.json("entertainments-vancouver", compression='gzip', mode="overwrite")
+	entertainments_data.write.json("../entertainments-vancouver", compression='gzip', mode="overwrite")
 
 if __name__ == '__main__':
 	spark = SparkSession.builder.appName('example code').getOrCreate()

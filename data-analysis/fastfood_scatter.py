@@ -8,7 +8,7 @@ from pyspark.ml.clustering import KMeans
 import matplotlib.pyplot as plt
 # add more functions as necessary
 
-inputs = "amenities-vancouver.json.gz"
+inputs = "../amenities-vancouver.json.gz"
 
 schema = types.StructType([
 	types.StructField('lat', types.DoubleType(), nullable=False),
@@ -47,9 +47,9 @@ def main():
 		.setFeaturesCol("features").setPredictionCol('prediction')
 	pipeline = Pipeline(stages=[assembler, kmeans_estimator])
 
-	#data_cluster(pipeline, fastfood, "Fastfood scatter", "fastfood_cluster.png")
-	#data_cluster(pipeline, subways, "Subway cluster", "subway_scatter.png")
-	#data_cluster(pipeline, timhortons, "Tim Hortons cluster", "timhorton_scatter.png")
+	#data_cluster(pipeline, fastfood, "Fastfood scatter", "../images/fastfood_cluster.png")
+	#data_cluster(pipeline, subways, "Subway cluster", "../images/subway_scatter.png")
+	#data_cluster(pipeline, timhortons, "Tim Hortons cluster", "../images/timhorton_scatter.png")
 
 
 	# restaurant = data.filter(data['amenity'] == 'restaurant')
@@ -69,7 +69,7 @@ def main():
 	# plt.xlabel("Latitude")
 	# plt.ylabel("Longitude")
 	# plt.title("Independent-owned restaurant scatter")
-	# plt.savefig("fastfood_vs_restaurant_scatter.png")
+	# plt.savefig("../images/fastfood_vs_restaurant_scatter.png")
 
 
 if __name__ == '__main__':
