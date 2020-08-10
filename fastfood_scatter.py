@@ -7,6 +7,9 @@ from pyspark.ml import Pipeline
 from pyspark.ml.clustering import KMeans
 import matplotlib.pyplot as plt
 # add more functions as necessary
+
+inputs = "amenities-vancouver.json.gz"
+
 schema = types.StructType([
 	types.StructField('lat', types.DoubleType(), nullable=False),
 	types.StructField('lon', types.DoubleType(), nullable=False),
@@ -28,7 +31,7 @@ def data_cluster(pipeline, data, title, path):
 				cmap='Set1', edgecolor='k', s=20)
 	plt.savefig(path)	
 
-def main(inputs, output=None):
+def main():
     # main logic starts here
 	data = spark.read.json(inputs, schema=schema)
 
@@ -70,11 +73,9 @@ def main(inputs, output=None):
 
 
 if __name__ == '__main__':
-	inputs = sys.argv[1]
-	#output = sys.argv[2]
 	spark = SparkSession.builder.appName('example code').getOrCreate()
 	assert spark.version >= '2.4' # make sure we have Spark 2.4+
 	spark.sparkContext.setLogLevel('WARN')
     #sc = spark.sparkContext
 
-	main(inputs)
+	main()

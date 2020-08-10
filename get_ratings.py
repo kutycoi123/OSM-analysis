@@ -16,11 +16,13 @@ def get_ratings(x):
 			print("Getting results")
 			return data['results'][0]['rating']
 	return None
+
 def main(inputs, output):
 	df = pd.read_json(inputs, orient='records', compression='gzip', lines=True)
 	df['rating'] = df.apply(get_ratings, axis=1)
 	print(df.head(10))
 	df.to_json(output, orient='records', compression='gzip', lines=True)
+	
 if __name__ == '__main__':
 	inputs = sys.argv[1]
 	output = sys.argv[2]

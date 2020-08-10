@@ -18,19 +18,17 @@ schema = types.StructType([
 entertainments = ['arts_centre', 'bistro', 'nightclub', 'bbq', 'car_rental',
                       'leisure', 'park', 'restaurant', 'bar', 'casino', 'gambling',
                       'cafe', 'theatre', 'stripclub', 'pub']
-def main(inputs, output):
+def main():
     # main logic starts here
-	data = spark.read.json(inputs, schema=schema)
+	data = spark.read.json("amenities-vancouver.json.gzip", schema=schema)
 	entertainments_data = data.filter(data.amenity.isin(entertainments))
 	#entertainments_data.show()
-	entertainments_data.write.json(output, compression='gzip', mode="overwrite")
+	entertainments_data.write.json("entertainments-vancouver", compression='gzip', mode="overwrite")
 
 if __name__ == '__main__':
-	inputs = sys.argv[1]
-	output = sys.argv[2]
 	spark = SparkSession.builder.appName('example code').getOrCreate()
 	assert spark.version >= '2.4' # make sure we have Spark 2.4+
 	spark.sparkContext.setLogLevel('WARN')
     #sc = spark.sparkContext
 
-	main(inputs, output)
+	main()

@@ -9,12 +9,10 @@ def dist(lat1, lon1, lat2, lon2):
     return 12742 * np.arcsin(np.sqrt(a))
 
 def main(inputs, locations, output=None):
-	#lat,lon = 49.268737,-123.045729
 	df = pd.read_json(inputs, orient='records', compression='gzip', lines=True)
 	loc = pd.read_csv(locations)
 	lat = loc['latitude'].to_numpy()
 	lon = loc['longitude'].to_numpy()
-	#print(df.head(50))
 	places = None
 	for i in range(len(lat)):
 		lat_value = lat[i]

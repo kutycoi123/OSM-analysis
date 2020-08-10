@@ -18,6 +18,7 @@ schema = types.StructType([
 	types.StructField('name', types.StringType(), nullable=True),
 	types.StructField('tags', types.MapType(types.StringType(), types.StringType()), nullable=False),
 ])
+
 def ratings(data):
 	lat, lon, name = data[0], data[1], data[2]
 	if name:
@@ -28,6 +29,7 @@ def ratings(data):
 		if len(data['results']) > 0:
 			return data['results'][0]['rating']
 	return 0
+	
 def main(inputs, output):
 	# main logic starts here
 	ratings_udf = functions.udf(ratings)
