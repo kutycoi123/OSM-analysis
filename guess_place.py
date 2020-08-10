@@ -21,7 +21,7 @@ def main(inputs, locations, output=None):
 		lon_value = lon[i]
 		df['dist'] = df.apply(lambda x: dist(x.lat, x.lon, lat_value, lon_value), axis=1)
 		if places is not None:
-			places = pd.concat([places, df[df['dist'] < 0.2]])
+			places = pd.concat([places, df[df['dist'] < 0.05]])
 		else:
 			places = df[df['dist'] < 0.05]
 	places = places.drop_duplicates(subset=['lat','lon'], keep='first')

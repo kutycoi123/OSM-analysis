@@ -16,6 +16,17 @@ schema = types.StructType([
 	types.StructField('tags', types.MapType(types.StringType(), types.StringType()), nullable=False),
 ])
 
+def data_cluster(pipeline, data, title, path):
+	model = pipeline.fit(data)
+	predictions = model.transform(data)
+	plt.xlabel("Latitude")
+	plt.ylabel("Longitude")
+	plt.title(title)
+	plt.scatter(predictions.select('lat').collect(),
+				predictions.select('lon').collect(),
+				c=predictions.select('prediction').collect(),
+				cmap='Set1', edgecolor='k', s=20)
+	plt.savefig(path)	
 
 def main(inputs, output=None):
     # main logic starts here
@@ -29,36 +40,33 @@ def main(inputs, output=None):
 	assembler = VectorAssembler(
 		inputCols = ['lat', 'lon'],
 		outputCol='features')
-	kmeans_estimator = KMeans().setK(10)\
+	kmeans_estimator = KMeans().setK(12)\
 		.setFeaturesCol("features").setPredictionCol('prediction')
 	pipeline = Pipeline(stages=[assembler, kmeans_estimator])
-	model_fastfood = pipeline.fit(fastfood)
-	model_subways = pipeline.fit(subways)
-	model_timhortons = pipeline.fit(timhortons)
 
-	predictions_fastfood = model_fastfood.transform(fastfood)
-	# predictions_subways = model_subways.transform(subways)
-	# predictions_timhortons = model_timhortons.transform(timhortons)
+	#data_cluster(pipeline, fastfood, "Fastfood scatter", "fastfood_cluster.png")
+	#data_cluster(pipeline, subways, "Subway cluster", "subway_scatter.png")
+	#data_cluster(pipeline, timhortons, "Tim Hortons cluster", "timhorton_scatter.png")
 
-	# plt.scatter(predictions_fastfood.select('lat').collect(),
-	# 			predictions_fastfood.select('lon').collect(),
-	# 			c=predictions_fastfood.select('prediction').collect(),
-	# 			cmap='Set1', edgecolor='k', s=20)
-	# plt.savefig("fastfood_scatter.png")
 
-	# plt.scatter(predictions_subways.select('lat').collect(),
-	# 			predictions_subways.select('lon').collect(),
-	# 			c=predictions_subways.select('prediction').collect(),
-	# 			cmap='Set1', edgecolor='k', s=20)
-	# plt.savefig("subway_scatter.png")
-	
-	# plt.scatter(predictions_timhortons.select('lat').collect(),
-	# 			predictions_timhortons.select('lon').collect(),
-	# 			c=predictions_timhortons.select('prediction').collect(),
-	# 			cmap='Set1', edgecolor='k', s=20)
-	# plt.savefig("timhorton_scatter.png")
-	#timhortons.show(100)
-	#mcdonald.show(100)
+	# restaurant = data.filter(data['amenity'] == 'restaurant')
+	# plt.figure(figsize=(10, 5))	
+	# plt.subplot(1,2,1)
+	# plt.scatter(fastfood.select('lat').collect(),
+	# 			fastfood.select('lon').collect(),
+	# 			s=2)
+	# plt.xlabel("Latitude")
+	# plt.ylabel("Longitude")
+	# plt.title("Fastfood scatter")
+
+	# plt.subplot(1,2,2)
+	# plt.scatter(restaurant.select('lat').collect(),
+	# 			restaurant.select('lon').collect(),
+	# 			s=2)
+	# plt.xlabel("Latitude")
+	# plt.ylabel("Longitude")
+	# plt.title("Independent-owned restaurant scatter")
+	# plt.savefig("fastfood_vs_restaurant_scatter.png")
 
 
 if __name__ == '__main__':

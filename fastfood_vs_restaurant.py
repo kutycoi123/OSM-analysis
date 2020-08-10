@@ -22,7 +22,7 @@ def main():
 	x = np.array(list(zip(restaurants_rating, fastfoods_rating)))
 	plt.hist(x, histtype='bar', label=['Restaurant', 'Fastfood'])
 	plt.title("Restaurant and fastfood ratings")
-	plt.legend(['Restaurant', 'Fastfood'])
+	plt.legend(['Independent-owned restaurant', 'Fast food restaurant'])
 	plt.savefig("fastfood_vs_restaurant_historgram.png")
 
 if __name__ == '__main__':

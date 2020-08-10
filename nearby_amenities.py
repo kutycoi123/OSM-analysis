@@ -20,35 +20,38 @@ schema = types.StructType([
 	types.StructField('tags', types.MapType(types.StringType(), types.StringType()), nullable=False),
 ])
 
-def main(inputs, output):
+def main():
     # main logic starts here
-	data = spark.read.json(inputs, schema=schema)
+	data = spark.read.json("entertainments-vancouver", schema=schema)
 	assembler = VectorAssembler(
 		inputCols = ['lat', 'lon'],
 		outputCol='features')
-	kmeans_estimator = KMeans().setK(10)\
+	kmeans_estimator = KMeans().setK(20)\
 		.setFeaturesCol("features").setPredictionCol('prediction')
 	pipeline = Pipeline(stages=[assembler, kmeans_estimator])
 	model = pipeline.fit(data)
 	predictions = model.transform(data)
-	plt.scatter(predictions.select('lat').collect(),
-				predictions.select('lon').collect(),
-				c=predictions.select('prediction').collect(),
-				cmap='Set1', edgecolor='k', s=20)
-	centers = model.stages[-1].clusterCenters()
+
+	centers = np.array(model.stages[-1].clusterCenters())
 	for center in centers:
 		print(center)
 
     #plt.show();return
-	plt.savefig(output)	
+    #plt.figure(figsize=(10,10))
+	plt.scatter(predictions.select('lat').collect(),
+				predictions.select('lon').collect(),
+				c=predictions.select('prediction').collect(),
+				cmap='Set1', edgecolor='k', s=20)    
+	plt.title("Amenities scatter")
+	plt.scatter(centers[:,0], centers[:,1], s=50)
+	#plt.show()
+	plt.savefig("nearby_amenities.png")	
 
 
 if __name__ == '__main__':
-	inputs = sys.argv[1]
-	output = sys.argv[2]
 	spark = SparkSession.builder.appName('example code').getOrCreate()
 	assert spark.version >= '2.4' # make sure we have Spark 2.4+
 	spark.sparkContext.setLogLevel('WARN')
     #sc = spark.sparkContext
 
-	main(inputs, output)
+	main()
