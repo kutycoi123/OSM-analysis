@@ -1,8 +1,8 @@
 import sys
 import pandas as pd
 
-inputs = "amenities-vancouver.json.gz"
-output = "fastfood.json.gz"
+inputs = "../amenities-vancouver.json.gz"
+output = "../fastfood.json.gz"
 
 def main():
 	df = pd.read_json(inputs, lines=True)

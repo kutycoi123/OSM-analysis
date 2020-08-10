@@ -22,7 +22,7 @@ schema = types.StructType([
 
 def main():
     # main logic starts here
-	data = spark.read.json("entertainments-vancouver", schema=schema)
+	data = spark.read.json("../entertainments-vancouver", schema=schema)
 	assembler = VectorAssembler(
 		inputCols = ['lat', 'lon'],
 		outputCol='features')
@@ -45,7 +45,7 @@ def main():
 	plt.title("Amenities scatter")
 	plt.scatter(centers[:,0], centers[:,1], s=50)
 	#plt.show()
-	plt.savefig("nearby_amenities.png")	
+	plt.savefig("../images/nearby_amenities.png")	
 
 
 if __name__ == '__main__':

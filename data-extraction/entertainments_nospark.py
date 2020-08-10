@@ -5,8 +5,8 @@ entertainments = ['arts_centre', 'bistro', 'nightclub', 'bbq', 'car_rental',
                       'leisure', 'park', 'restaurant', 'bar', 'casino', 'gambling',
                       'cafe', 'theatre', 'stripclub', 'pub']
 
-inputs = "amenities-vancouver.json.gz"
-output = "entertainments-vancouver.json.gzip"
+inputs = "../amenities-vancouver.json.gz"
+output = "../entertainments-vancouver.json.gzip"
 def main():
 	df = pd.read_json(inputs, lines=True)
 	df = df[df['amenity'].isin(entertainments)]
