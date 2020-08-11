@@ -5,4 +5,4 @@
 |Ratings of fast food and independen-owned restaurant|fastfood_vs_restaurant.py|python3 fastfood_vs_restaurant.py|fastfood_vs_restaurant_histogram.png|
 |Guess nearby places based on locations|guess_place.py|python3 guess_place.py|guessed-places.json|
 |Good place to book a hotel|nearby_amenities.py|spark-submit nearby_amenities.py|nearby_amenitis.png|
-Note: all the result images will be located inside images folder. 
+- Note: all the result images will be located inside images folder. 
