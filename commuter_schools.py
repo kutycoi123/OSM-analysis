@@ -32,19 +32,14 @@ amenity_schema = types.StructType([
 ])
 
 
-def main(inputs, output):
+def main(inputs):
     poi = spark.read.json(inputs, schema=amenity_schema)
     poi = poi.filter((poi['lon'] > -123.5) & (poi['lon'] < -122))
     poi = poi.filter((poi['lat'] > 49) & (poi['lat'] < 49.5))
-    # poi.show(100)
-    # schools = poi.filter(poi['amenity'] == 'school')
-    # prediction_data = poi.filter((functions.size('tags') > 0) & (poi['name'] != 'null'))
-
-    # training, validation = schools.randomSplit([.7, .3])
 
     stage1 = VectorAssembler(inputCols =['lon', 'lat'], outputCol='features')
     stage2 = MinMaxScaler(inputCol="features", outputCol="scaledFeatures")
-    stage3 = KMeans().setK(6).setFeaturesCol("scaledFeatures").setPredictionCol('prediction')
+    stage3 = KMeans().setK(7).setFeaturesCol("scaledFeatures").setPredictionCol('prediction')
     pipeline = Pipeline(stages=[stage1, stage2, stage3])
     model = pipeline.fit(poi)
     predictions = model.transform(poi)
@@ -52,14 +47,15 @@ def main(inputs, output):
                 predictions.select('lat').collect(),
                 c=predictions.select('prediction').collect(),
                 cmap='Set1', edgecolor='k', s=20)
-    plt.savefig('potential_bus_zone')
-    # plt.show()
-
+    plt.title('Potential Bus Zone')
+    plt.xlabel('Longitude')
+    plt.ylabel('Latitude')
+    plt.savefig('Potential_Bus_Zone')
     #poi = poi.coalesce(1) # ~1MB after the filtering 
     # poi.write.json(output, mode='overwrite', compression='gzip')
 
 
 if __name__ == '__main__':
     inputs = sys.argv[1]
-    output = sys.argv[2]
-    main(inputs, output)
+    # output = sys.argv[2]
+    main(inputs)

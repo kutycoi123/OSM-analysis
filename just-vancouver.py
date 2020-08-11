@@ -28,7 +28,8 @@ def main(inputs, output):
     poi = poi.filter((poi['lon'] > -123.5) & (poi['lon'] < -122))
     poi = poi.filter((poi['lat'] > 49) & (poi['lat'] < 49.5))
     #poi = poi.coalesce(1) # ~1MB after the filtering 
-    poi.show(100)
+    amenity = poi.groupby('amenity').agg(functions.count(poi['lat']).alias('count'))
+    amenity.sort(functions.desc('count')).show(100)
     poi.write.json(output, mode='overwrite', compression='gzip')
 
 

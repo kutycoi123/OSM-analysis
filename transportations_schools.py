@@ -23,26 +23,44 @@ amenity_schema = types.StructType([
     types.StructField('tags', types.MapType(types.StringType(), types.StringType()), nullable=False),
 ])
 
-transportations_schools = ['bicycle_parking', 'bus_station', 'parking', 'fuel',
+transportations = ['bicycle_parking', 'bus_station', 'parking', 'fuel',
                     'car_sharing', 'ferry_terminal', 'parking_entrance', 'seaplane terminal']
-# transportations = ['bus_station']
+schools = ['school', 'university', 'college']
 
-# transportations =['bicycle_parking']
-def main(inputs, output):
+def main(inputs):
     poi = spark.read.json(inputs, schema=amenity_schema)
     poi = poi.filter((poi['lon'] > -123.5) & (poi['lon'] < -122))
     poi = poi.filter((poi['lat'] > 49) & (poi['lat'] < 49.5))
     #poi = poi.coalesce(1) # ~1MB after the filtering 
 
-    transportations_data = poi.filter(poi.amenity.isin(transportations_schools))
-    # transportations_data = transportations_data.filter(functions.size('tags') > 0)
+    transportations_data = poi.filter(poi.amenity.isin(transportations))
+    schools_data = poi.filter(poi.amenity.isin(schools))
+    plt.figure(figsize=(10, 6))
+    plt.subplot(1, 2, 1)
+    plt.xticks(rotation=25)
     plt.scatter(transportations_data.select('lon').collect(), transportations_data.select('lat').collect(), s = 20, marker='.')
     # plt.show()
-    plt.savefig('transportations_schools_map')
-    transportations_data.write.json(output, mode='overwrite', compression='gzip')
+    plt.xlim(-123.5, -122)
+    plt.ylim(49, 49.5)
+    plt.title('Transportations Distribution')
+    plt.xlabel('Longitude')
+    plt.ylabel('Latitude')
 
+    plt.subplot(1, 2, 2)
+    plt.xticks(rotation=25)
+    plt.scatter(schools_data.select('lon').collect(), schools_data.select('lat').collect(), s = 20, marker='o', color='b')
+    # plt.show()
+    plt.xlim(-123.5, -122)
+    plt.ylim(49, 49.5)
+    plt.title('Schools Distribution')
+    plt.xlabel('Longitude')
+    plt.ylabel('Latitude')
+    plt.savefig('School_Distribution')
+
+    plt.savefig('Transportation_School_Distribution')
+
+    # transportations_data.write.json(output, mode='overwrite', compression='gzip')
 
 if __name__ == '__main__':
     inputs = sys.argv[1]
-    output = sys.argv[2]
-    main(inputs, output)
+    main(inputs)

@@ -7,6 +7,8 @@ import re
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from datetime import date
+from scipy import stats
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
 from pyspark.ml.feature import VectorAssembler
@@ -33,10 +35,13 @@ amenity_schema = types.StructType([
 ])
 
 def year_month(s):
-	return re.search(r'(\d+\-\d+).*', s).group(1)
+	return re.search(r'(\d+\-\d+\-\d+).*', s).group(1)
 
 def to_timestamp(x):
 	return x.timestamp()
+
+def day_num(x):
+    return x.weekday()
 
 def main(inputs):
     poi = spark.read.json(inputs, schema=amenity_schema)
@@ -47,48 +52,38 @@ def main(inputs):
     split_date = functions.split(poi['timestamp'], ' ')
     poi = poi.withColumn('date', split_date.getItem(0))
 
-    remove_day = functions.udf(year_month, returnType=types.StringType())
+    remove_hour = functions.udf(year_month, returnType=types.StringType())
 
     bike_parking = poi.select(
     	poi['lon'],
     	poi['lat'],
-    	remove_day(poi['date']).alias('date'),
-    	poi['amenity'],
-    	poi['name']
+    	remove_hour(poi['date']).alias('date'),
+    	poi['amenity']
     )
-    # print(bike_parking.count())
-    grouped_month = bike_parking.groupby('date').agg(functions.count(bike_parking['amenity']).alias('count'))
-    grouped_month = grouped_month.filter(grouped_month['count'] > 10)
-    grouped_month = grouped_month.sort('date')
-    df = grouped_month.toPandas() 
-    df['date'] = pd.to_datetime(df['date'])
-    # df= df[df['date'] > '2017-01']
-    df['timestamp'] = df['date'].apply(to_timestamp)
-    
-    poly = PolynomialFeatures(degree=4, include_bias=True)
-    X = np.stack([df['timestamp']], axis=1)
-    y = df['count']
-    X_poly = poly.fit_transform(X)
-    model = LinearRegression(fit_intercept=False)
-    model.fit(X_poly, y)
-    plt.plot(df['date'], y, 'b.')
-    plt.plot(df['date'], model.predict(X_poly), 'r-')
-    plt.title('Bike Parking Prediction')
-    plt.xlabel('Year')
-    plt.ylabel('Numbers of Checkin')
-    plt.legend(['actual data', 'predicted line'])
-    plt.savefig('Prediction_of_Bike_Use')
 
-    # sns.set(color_codes=True)
-    # plt.figure(figsize=(10, 5))
-    # plt.xticks(rotation=25)
-    # plt.locator_params(axis='x', nbins=10)
-    # plt.plot(df['date'], df['count'], 'b')
-    # plt.title('Bike Parking Checkin')
-    # plt.xlabel('Date by Month/Year')
-    # plt.ylabel('Numbers of Checkin')
-    # plt.savefig('Bike_Parking_Checkin')
-    # plt.show()
+    grouped = bike_parking.groupby('date').agg(functions.count(bike_parking['amenity']).alias('count'))
+    # grouped_month = grouped_month.filter(grouped_month['count'] > 10)
+    grouped = grouped.sort('date')
+
+    df = grouped.toPandas() 
+    df['date'] = pd.to_datetime(df['date'])
+    df['day_num'] = df['date'].apply(day_num)
+    weekdays = df[df['day_num'] < 5]
+    weekends = df[df['day_num'] >= 5]
+    # print(weekdays)
+    sqrt_weekdays = np.sqrt(weekdays['count'])
+    sqrt_weekends = np.sqrt(weekends['count'])
+    print(stats.normaltest(weekends['count']).pvalue)
+    print(stats.ttest_ind(weekdays['count'],weekends['count']).pvalue)
+    plt.hist([sqrt_weekdays,sqrt_weekends])
+    plt.title('Weekdays vs Weekends Count')
+    plt.xlabel('Count')
+    plt.ylabel('Intensity')
+    plt.legend(['Weekdays', 'Weekends'])
+    plt.savefig('Histogram_Bike_Parking_Count')
+    plt.show()
+    # df['timestamp'] = df['date'].apply(to_timestamp)
+    
 
 if __name__ == '__main__':
     inputs = sys.argv[1]
