@@ -91,5 +91,5 @@ def main(inputs):
     # plt.show()
 
 if __name__ == '__main__':
-    inputs = sys.argv[1]
+    inputs = 'amenities-vancouver.json.gz'
     main(inputs)

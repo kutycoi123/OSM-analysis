@@ -89,6 +89,6 @@ def main(inputs, output):
 
 
 if __name__ == '__main__':
-    inputs = sys.argv[1]
-    output = sys.argv[2]
+    inputs = 'amenities-vancouver.json.gz'
+    output = 'fuel_stations_info'
     main(inputs, output)

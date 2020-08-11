@@ -73,7 +73,6 @@ def main(inputs):
     # print(weekdays)
     sqrt_weekdays = np.sqrt(weekdays['count'])
     sqrt_weekends = np.sqrt(weekends['count'])
-    print(stats.normaltest(weekends['count']).pvalue)
     print(stats.ttest_ind(weekdays['count'],weekends['count']).pvalue)
     plt.hist([sqrt_weekdays,sqrt_weekends])
     plt.title('Weekdays vs Weekends Count')
@@ -81,10 +80,8 @@ def main(inputs):
     plt.ylabel('Intensity')
     plt.legend(['Weekdays', 'Weekends'])
     plt.savefig('Histogram_Bike_Parking_Count')
-    plt.show()
-    # df['timestamp'] = df['date'].apply(to_timestamp)
-    
+    # plt.show()    
 
 if __name__ == '__main__':
-    inputs = sys.argv[1]
+    inputs = 'transportation.json.gz'
     main(inputs)

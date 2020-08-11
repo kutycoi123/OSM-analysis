@@ -56,6 +56,6 @@ def main(inputs):
 
 
 if __name__ == '__main__':
-    inputs = sys.argv[1]
+    inputs = 'transportations.json.gz'
     # output = sys.argv[2]
     main(inputs)

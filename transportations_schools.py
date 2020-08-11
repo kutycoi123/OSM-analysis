@@ -27,7 +27,7 @@ transportations = ['bicycle_parking', 'bus_station', 'parking', 'fuel',
                     'car_sharing', 'ferry_terminal', 'parking_entrance', 'seaplane terminal']
 schools = ['school', 'university', 'college']
 
-def main(inputs):
+def main(inputs, output):
     poi = spark.read.json(inputs, schema=amenity_schema)
     poi = poi.filter((poi['lon'] > -123.5) & (poi['lon'] < -122))
     poi = poi.filter((poi['lat'] > 49) & (poi['lat'] < 49.5))
@@ -58,9 +58,9 @@ def main(inputs):
     plt.savefig('School_Distribution')
 
     plt.savefig('Transportation_School_Distribution')
-
-    # transportations_data.write.json(output, mode='overwrite', compression='gzip')
+    transportations_data.write.json(output, mode='overwrite', compression='gzip')
 
 if __name__ == '__main__':
-    inputs = sys.argv[1]
-    main(inputs)
+    inputs = 'amenities-vancouver.json.gz'
+    output = 'transportations'
+    main(inputs,output)
