@@ -10,5 +10,5 @@
 |Transportations and Schools Distribution|trans_schools_dist.py|python3 trans_schools_dist.py|Transportation_School_Distribution.png|
 |Guess school zone|commuter_schools.py|spark-submit commuter_schools.py|Potential_School_Zone.png|
 |Score of accessibility of gas stations|fuel_stations.py|spark-submit fuel_stations.py|fuel_stations_information with csv file|
-|Bike parking usage with weekday and weekend|weekend_weekday.py|pyspark weekend_weekday.py|Histogram_Bike_Parking_Count.png|
+|Bike parking usage with weekday and weekend|weekend_weekday.py|spark-submit weekend_weekday.py|Histogram_Bike_Parking_Count.png|
 - Note: all the result images will be located inside images folder. 
