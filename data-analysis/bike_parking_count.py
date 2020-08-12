@@ -16,7 +16,6 @@ from pyspark.ml import Pipeline
 from pyspark.ml.feature import MinMaxScaler
 from pyspark.ml.linalg import Vectors
 
-
 spark = SparkSession.builder.appName('bike_parking').getOrCreate()
 assert spark.version >= '2.4' # make sure we have Spark 2.4+
 spark.sparkContext.setLogLevel('WARN')
