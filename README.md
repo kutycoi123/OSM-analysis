@@ -1,4 +1,4 @@
-# CMPT353 Final Project - OpenStreetMap analysis
+# OpenStreetMap analysis
 Author: TRUNGLAM NGUYEN and QUAN NGUYEN
 ## Requirements
 + Language: python3
